@@ -1,0 +1,176 @@
+#+title: 有LAG在Linux上的x86組合語言練習(使用NASM)
+#+date: <2019-09-23 一 05:22>
+
+
+
+#+name: hello.asm
+#+begin_src asm :tangle src/hello.asm :mkdirp yes
+section     .text
+global      _start                              ;must be declared for linker (ld)
+
+_start:                                                 ;tell linker entry point
+
+        mov     edx,len                             ;message length
+        mov     ecx,        msg                     ;message to write
+        mov     ebx,1                               ;file descriptor (stdout)
+        mov     eax,4                               ;system call number (sys_write)
+        int     0x80                                ;call kernel
+
+        mov     eax,1                               ;system call number (sys_exit)
+        int     0x80                                ;call kernel
+
+
+section     .data
+
+        msg     db  'Hello, world!',0xa                 ;our dear string
+        len      equ $ - msg                             ;length of our dear string
+#+end_src
+
+#+name: compile_hello.asm
+#+begin_src bash :dir src/ :results none
+nasm -f elf64 hello.asm -o hello.o
+ld -m elf_x86_64 hello.o -o hello
+#+end_src
+
+#+name: exec_hello
+#+begin_src bash :dir src/ :session exec_asm :results output :async
+./hello
+#+end_src
+
+#+RESULTS: exec_hello
+: Hello, world!
+
+#+name: ex1.asm
+#+begin_src asm :tangle src/ex1.asm :mkdirp yes
+        global _start
+
+_start:
+        mov eax, 1
+        mov ebx, 42
+        sub ebx, 29
+        int 0x80                ;eax:1 -> terminal print; ebx:status
+#+end_src
+
+#+name: compile_ex1.asm
+#+begin_src bash :dir src/ :results none
+nasm -f elf64 ex1.asm -o ex1.o
+ld -m elf_x86_64 ex1.o -o ex1
+#+end_src
+
+#+name: exec_ex1
+#+begin_src bash :dir src/ :session exec_asm :results output :async
+./ex1
+echo $?
+#+end_src
+
+#+RESULTS: exec_ex1
+:
+: 13
+
+
+
+#+name: ex2.asm
+#+begin_src asm :tangle src/ex2.asm :mkdirp yes
+        global _start
+
+        section .data
+        msg db "Ex, World!", 0x0a
+        len equ $ - msg
+
+        section .text
+
+_start:
+        mov eax, 4              ; sys_write system call
+        mov ebx, 1              ; stdout file descriptor
+        mov ecx, msg            ; byte to write
+        mov edx, len            ; number of bytes to write
+        int 0x80                ; perform system call
+#+end_src
+
+#+name: compile_ex2.asm
+#+begin_src bash :dir src/ :results none
+nasm -f elf64 ex2.asm -o ex2.o
+ld -m elf_x86_64 ex2.o -o ex2
+#+end_src
+
+#+name: exec_ex2
+#+begin_src bash :dir src/ :session exec_asm :results output :async
+./ex2
+#+end_src
+
+#+RESULTS: exec_ex2
+: Hello, World!
+: 程式記憶體區段錯誤 (核心已傾印)
+
+
+#+name: ex3.asm
+#+begin_src asm :tangle src/ex3.asm :mkdirp yes
+;;;  about jump
+;;; je A,B ; jump if Equal
+;;; jne A, B; jump if Not Equal
+;;; jg A, B ; jump if Greater
+;;; jge A, B; jump if Grater or Equal
+;;; jl A, B ; jump if Less
+;;; jle A, B ; jump if Less or Equal
+
+        global _start
+        section .text
+_start:
+        mov ecx, 101             ; set exc to 99
+        mov ebx, 42             ; exit status is 42
+        mov eax, 1              ; sys_exit system call
+        cmp ecx, 100            ; compare ecx to 100
+        jl skip                 ; jump if less then
+        mov ebx, 13             ; exit status is 13
+skip:
+        int 0x80
+#+end_src
+
+#+name: compile_ex3.asm
+#+begin_src bash :dir src/ :results none
+nasm -f elf64 ex3.asm -o ex3.o
+ld -m elf_x86_64 ex3.o -o ex3
+#+end_src
+
+#+name: exec_ex3
+#+begin_src bash :dir src/ :session exec_asm :results output :async
+./ex3
+echo $?
+#+end_src
+
+#+RESULTS: exec_ex3
+:
+: 13
+
+
+#+name: ex4.asm
+#+begin_src asm :tangle src/ex4.asm :mkdirp yes
+        global _start
+        section .text
+_start:
+        mov ebx, 1              ;start ebx at 1
+        mov ecx, 6              ; number of iterations
+label:
+        add ebx, ebx            ; ebx += ebx
+        dec ecx                 ; ecx -= 1 ; inc => +1
+        cmp ecx, 0              ; compare ecx with 0
+        jg label                ; jump to label if greater
+        mov eax, 1              ; sys_exit system call
+        int 0x80
+#+end_src
+
+#+name: compile_ex4.asm
+#+begin_src bash :dir src/ :results none
+nasm -f elf64 ex4.asm -o ex4.o
+ld -m elf_x86_64 ex4.o -o ex4
+#+end_src
+
+#+name: exec_ex4
+#+begin_src bash :dir src/ :session exec_asm :results output :async
+./ex4
+echo $?
+#+end_src
+
+#+RESULTS: exec_ex4
+:
+: 64
