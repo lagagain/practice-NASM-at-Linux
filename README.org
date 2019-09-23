@@ -1,8 +1,42 @@
-#+title: 有LAG在Linux上的x86組合語言練習(使用NASM)
+#+title: 又LAG在Linux上的x86組合語言練習(使用NASM)
+#+author: lagagain(LAG)
 #+date: <2019-09-23 一 05:22>
+* 說明
+  這是我的NASM組合語言練習筆記。我是根據[[https://www.youtube.com/watch?v=wLXIWKUWpSs&list=PLmxT2pVYo5LB5EzTPZGfFN0c2GDiSXgQe][{YouTube}Intro to x86 Assembly Language]]進行學習。筆記下多數程式碼是該影片的範例修改而來。
+* 建置(Build)&執行(Exec)
+  建置以前你需要先將本範例中的程式碼 =tangle= 出去。
+
+  #+begin_src elisp :results list
+    (org-babel-tangle)
+  #+end_src
+
+  #+RESULTS:
+  - src/ex4.asm
+  - src/ex3.asm
+  - src/ex2.asm
+  - src/ex1.asm
+  - src/hello.asm
 
 
+  接著建置：
+  #+begin_src bash
+  make
+  #+end_src
 
+  所有目的執行程式都會在 =build= 目錄下。你可以參考本筆記內容執行程式，或是在Emacs org-mode下執行本筆記。
+
+  #+begin_comment
+  不知道Jupyter-Notebooke能不能寫的像Org-mode這麼靈活0.0
+  #+end_comment
+
+** 清除(Clean)
+   #+begin_src bash
+   make clean
+   #+end_src
+
+
+* Hello World
+  程式碼：
 #+name: hello.asm
 #+begin_src asm :tangle src/hello.asm :mkdirp yes
 section     .text
@@ -26,12 +60,14 @@ section     .data
         len      equ $ - msg                             ;length of our dear string
 #+end_src
 
+編譯：
 #+name: compile_hello.asm
 #+begin_src bash :dir src/ :results none
 nasm -f elf64 hello.asm -o hello.o
 ld -m elf_x86_64 hello.o -o hello
 #+end_src
 
+執行：
 #+name: exec_hello
 #+begin_src bash :dir src/ :session exec_asm :results output :async
 ./hello
@@ -40,6 +76,7 @@ ld -m elf_x86_64 hello.o -o hello
 #+RESULTS: exec_hello
 : Hello, world!
 
+* Example1
 #+name: ex1.asm
 #+begin_src asm :tangle src/ex1.asm :mkdirp yes
         global _start
@@ -68,7 +105,7 @@ echo $?
 : 13
 
 
-
+* Example2
 #+name: ex2.asm
 #+begin_src asm :tangle src/ex2.asm :mkdirp yes
         global _start
@@ -106,7 +143,7 @@ ld -m elf_x86_64 ex2.o -o ex2
 #+RESULTS: exec_ex2
 : Hello, World!
 
-
+* Example3
 #+name: ex3.asm
 #+begin_src asm :tangle src/ex3.asm :mkdirp yes
 ;;;  about jump
@@ -146,7 +183,7 @@ echo $?
 :
 : 13
 
-
+* Example4
 #+name: ex4.asm
 #+begin_src asm :tangle src/ex4.asm :mkdirp yes
         global _start
@@ -178,3 +215,11 @@ echo $?
 #+RESULTS: exec_ex4
 :
 : 64
+
+* 授權(LICENSE)
+  *本筆記除了程式碼部份外，其餘部份採用CC-3.0授權。*
+  #+begin_src html
+  <a rel="license" href="http://creativecommons.org/licenses/by/3.0/tw/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by/3.0/tw/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">又LAG在Linux上的x86組合語言練習(使用NASM)</span>由<a xmlns:cc="http://creativecommons.org/ns#" href="https://www.lagagain.com" property="cc:attributionName" rel="cc:attributionURL"> lagagain(LAG)</a>製作，以<a rel="license" href="http://creativecommons.org/licenses/by/3.0/tw/">創用CC 姓名標示 3.0 台灣 授權條款</a>釋出。
+  #+end_src
+* 後記
+  雖然我以前就有NASM的基礎，不過以前看的書的範例平台是使用Windows，也未太過深入了解系統中斷、系統呼叫。這次有比較深入的學習。
