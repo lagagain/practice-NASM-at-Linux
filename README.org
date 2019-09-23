@@ -221,6 +221,44 @@ echo $?
 :
 : 64
 
+* Example5
+
+#+name: ex5.asm
+#+begin_src asm :tangle src/ex5.asm :mkdirp yes
+  global _start
+
+  section .data
+      addr db "yellow"
+
+  section .text
+  _start:
+      mov [addr], byte 'H'
+      mov [addr+5], byte '!'
+      mov eax, 4    ; sys_write system call
+      mov ebx, 1    ; stdout file descriptor
+      mov ecx, addr ; bytes to write
+      mov edx, 6    ; number of bytes to write
+      int 0x80      ; perform system call
+      mov eax, 1    ; sys_exit system call
+      mov ebx, 0    ; exit status is 0
+      int 0x80
+#+end_src
+
+#+name: compile_ex5.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex5.asm -o ex5.o
+        ld -m elf_i386 ex5.o -o ex5
+#+end_src
+
+#+name: exec_ex5
+#+begin_src bash :dir src/ :results output
+./ex5
+#+end_src
+
+#+RESULTS: exec_ex5
+: Hello!
+
+
 * 授權(LICENSE)
   *本筆記除了程式碼部份外，其餘部份採用CC-3.0授權。*
 #+begin_export html
