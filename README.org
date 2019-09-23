@@ -3,6 +3,7 @@
 #+author: lagagain(LAG)
 #+date: <2019-09-23 一 05:22>
 #+export_file_name: docs/index
+#+options: toc:nil
 
 
 * 說明
