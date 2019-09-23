@@ -6,6 +6,7 @@ TARGET += ${BUILD_DIR}/ex1
 TARGET += ${BUILD_DIR}/ex2
 TARGET += ${BUILD_DIR}/ex3
 TARGET += ${BUILD_DIR}/ex4
+TARGET += ${BUILD_DIR}/ex5
 
 all: build_dir ${TARGET}
 
