@@ -258,6 +258,42 @@ echo $?
 #+RESULTS: exec_ex5
 : Hello!
 
+* Example6
+
+#+name: ex6.asm
+#+begin_src asm :tangle src/ex6.asm :mkdirp yes
+global _start
+
+_start:
+    sub esp, 4
+    mov [esp], byte 'H'
+    mov [esp+1], byte 'e'
+    mov [esp+2], byte 'y'
+    mov [esp+3], byte '!'
+    mov eax, 4    ; sys_write system call
+    mov ebx, 1    ; stdout file descriptor
+    mov ecx, esp  ; bytes to write
+    mov edx, 4    ; number of bytes to write
+    int 0x80      ; perform system call
+    mov eax, 1    ; sys_exit system call
+    mov ebx, 0    ; exit status is 0
+    int 0x80
+#+end_src
+
+#+name: compile_ex6.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex6.asm -o ex6.o
+        ld -m elf_i386 ex6.o -o ex6
+#+end_src
+
+#+name: exec_ex6
+#+begin_src bash :dir src/ :results output
+./ex6
+#+end_src
+
+#+RESULTS: exec_ex6
+: Hey!
+
 
 * 授權(LICENSE)
   *本筆記除了程式碼部份外，其餘部份採用CC-3.0授權。*
