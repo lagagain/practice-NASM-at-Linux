@@ -3,6 +3,7 @@
 # 說明
 
 這是我的NASM組合語言練習筆記。我是根據[{YouTube}Intro to x86 Assembly Language](https://www.youtube.com/watch?v=wLXIWKUWpSs&list=PLmxT2pVYo5LB5EzTPZGfFN0c2GDiSXgQe)進行學習。筆記下多數程式碼是該影片的範例修改而來。
+原始程式碼倉庫：<https://github.com/code-tutorials/assembly-intro>
 
 
 # 建置(Build)&執行(Exec)
@@ -27,6 +28,15 @@
 ## 清除(Clean)
 
     make clean
+
+
+# Linux 系統呼叫
+
+-   [Linux Syscall Reference](https://syscalls.kernelgrok.com/)
+-   [Linux and Unix exit code tutorial with examples](https://shapeshed.com/unix-exit-codes/)
+-   [Linux系統呼叫（System call）函式增加篇『總整理』](https://linux.incomeself.com/linux%E7%B3%BB%E7%B5%B1%E5%91%BC%E5%8F%AB%EF%BC%88system-call%EF%BC%89%E5%87%BD%E5%BC%8F%E5%A2%9E%E5%8A%A0%E7%AF%87%E3%80%8E%E7%B8%BD%E6%95%B4%E7%90%86%E3%80%8F/)
+
+系統呼叫表原始碼位置： `/usr/src/linux-headers-4.4.0-98-generic/arch/x86/include/generated/uapi/asm/unistd_64.h`
 
 
 # Hello World
@@ -170,6 +180,167 @@
 
     
     64
+
+
+# Example5
+
+    global _start
+    
+    section .data
+        addr db "yellow"
+    
+    section .text
+    _start:
+        mov [addr], byte 'H'
+        mov [addr+5], byte '!'
+        mov eax, 4    ; sys_write system call
+        mov ebx, 1    ; stdout file descriptor
+        mov ecx, addr ; bytes to write
+        mov edx, 6    ; number of bytes to write
+        int 0x80      ; perform system call
+        mov eax, 1    ; sys_exit system call
+        mov ebx, 0    ; exit status is 0
+        int 0x80
+
+    nasm -f elf32 ex5.asm -o ex5.o
+    ld -m elf_i386 ex5.o -o ex5
+
+    ./ex5
+
+    Hello!
+
+
+# Example6
+
+    global _start
+    
+    _start:
+        sub esp, 4
+        mov [esp], byte 'H'
+        mov [esp+1], byte 'e'
+        mov [esp+2], byte 'y'
+        mov [esp+3], byte '!'
+        mov eax, 4    ; sys_write system call
+        mov ebx, 1    ; stdout file descriptor
+        mov ecx, esp  ; bytes to write
+        mov edx, 4    ; number of bytes to write
+        int 0x80      ; perform system call
+        mov eax, 1    ; sys_exit system call
+        mov ebx, 0    ; exit status is 0
+        int 0x80
+
+    nasm -f elf32 ex6.asm -o ex6.o
+    ld -m elf_i386 ex6.o -o ex6
+
+    ./ex6
+
+    Hey!
+
+
+# Example7
+
+     1  global _start
+     2  
+     3  _start:
+     4      call func
+     5      mov eax, 1                  ;
+     6      int 0x80
+     7  
+     8  func:
+     9      mov ebx, 42
+    10      pop eax                     ;
+    11      jmp eax                     ;
+
+32 bit的暫存器用eax命名，64 bits的叫rax(第5行)。
+
+第10-11行 同樣可以表示為 `ret` ，見下方ex7-2
+
+    nasm -f elf32 ex7-1.asm -o ex7-1.o
+    ld -m elf_i386 ex7-1.o -o ex7-1
+
+    ./ex7-1
+    echo $?
+
+    42
+
+---
+
+    global _start
+    
+    _start:
+        call func
+        mov eax, 1
+        int 0x80
+    
+    func:
+        mov ebx, 42
+        ret
+
+    nasm -f elf32 ex7-2.asm -o ex7-2.o
+    ld -m elf_i386 ex7-2.o -o ex7-2
+
+    1  ./ex7-2
+    2  echo $?
+    3  
+
+    42
+
+
+# Example8
+
+    global _start
+    
+    _start:
+        call func
+        mov eax, 1
+        mov ebx, 0
+        int 0x80
+    
+    func:
+        push ebp
+        mov ebp, esp
+        sub esp, 2
+        mov [esp], byte 'H'
+        mov [esp+1], byte 'i'
+        mov eax, 4    ; sys_write system call
+        mov ebx, 1    ; stdout file descriptor
+        mov ecx, esp  ; bytes to write
+        mov edx, 2    ; number of bytes to write
+        int 0x80      ; perform system call
+        mov esp, ebp
+        pop ebp
+        ret
+
+    nasm -f elf32 ex8.asm -o ex8.o
+    ld -m elf_i386 ex8.o -o ex8
+
+    ./ex8
+
+    Hi
+
+
+# TODO Example9
+
+    
+
+    nasm -f elf32 ex9.asm -o ex9.o
+    ld -m elf_i386 ex9.o -o ex9
+
+    ./ex9
+
+    Hey!
+
+
+# TODO Example10
+
+    
+
+    nasm -f elf32 ex10.asm -o ex10.o
+    ld -m elf_i386 ex10.o -o ex10
+
+    ./ex10
+
+    Hey!
 
 
 # 授權(LICENSE)

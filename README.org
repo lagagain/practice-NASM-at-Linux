@@ -8,6 +8,7 @@
 
 * 說明
   這是我的NASM組合語言練習筆記。我是根據[[https://www.youtube.com/watch?v=wLXIWKUWpSs&list=PLmxT2pVYo5LB5EzTPZGfFN0c2GDiSXgQe][{YouTube}Intro to x86 Assembly Language]]進行學習。筆記下多數程式碼是該影片的範例修改而來。
+  原始程式碼倉庫：https://github.com/code-tutorials/assembly-intro
 * 建置(Build)&執行(Exec)
   建置以前你需要先將本範例中的程式碼 =tangle= 出去。
 
@@ -306,6 +307,152 @@ _start:
 #+end_src
 
 #+RESULTS: exec_ex6
+: Hey!
+
+* Example7
+#+name: ex7-1.asm
+#+begin_src asm -n -r :tangle src/ex7-1.asm :mkdirp yes
+  global _start
+
+  _start:
+      call func
+      mov eax, 1                  ;(ref:ex7-1 32bit register)
+      int 0x80
+
+  func:
+      mov ebx, 42
+      pop eax                     ;(ref:ex7-1 pop eax)
+      jmp eax                     ;(ref:ex7-1 jmp eax)
+#+end_src
+
+32 bit的暫存器用eax命名，64 bits的叫rax(第[[(ex7-1 32bit register)]]行)。
+
+第[[(ex7-1 pop eax)]]-[[(ex7-1 jmp eax)]]行 同樣可以表示為 =ret= ，見下方ex7-2
+#+name: compile_ex7-1.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex7-1.asm -o ex7-1.o
+        ld -m elf_i386 ex7-1.o -o ex7-1
+#+end_src
+
+#+name: exec_ex7-1
+#+begin_src bash :dir src/ :results output
+./ex7-1
+echo $?
+#+end_src
+
+#+RESULTS: exec_ex7-1
+: 42
+
+--------------------
+
+#+name: ex7-2.asm
+#+begin_src asm :tangle src/ex7-2.asm :mkdirp yes
+global _start
+
+_start:
+    call func
+    mov eax, 1
+    int 0x80
+
+func:
+    mov ebx, 42
+    ret
+#+end_src
+
+#+name: compile_ex7-2.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex7-2.asm -o ex7-2.o
+        ld -m elf_i386 ex7-2.o -o ex7-2
+#+end_src
+
+#+name: exec_ex7-2
+#+begin_src bash -n -r :dir src/ :results output
+./ex7-2
+echo $?
+
+#+end_src
+#+RESULTS: exec_ex7-2
+: 42
+
+* Example8
+
+#+name: ex8.asm
+#+begin_src asm :tangle src/ex8.asm :mkdirp yes
+global _start
+
+_start:
+    call func
+    mov eax, 1
+    mov ebx, 0
+    int 0x80
+
+func:
+    push ebp
+    mov ebp, esp
+    sub esp, 2
+    mov [esp], byte 'H'
+    mov [esp+1], byte 'i'
+    mov eax, 4    ; sys_write system call
+    mov ebx, 1    ; stdout file descriptor
+    mov ecx, esp  ; bytes to write
+    mov edx, 2    ; number of bytes to write
+    int 0x80      ; perform system call
+    mov esp, ebp
+    pop ebp
+    ret
+#+end_src
+
+#+name: compile_ex8.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex8.asm -o ex8.o
+        ld -m elf_i386 ex8.o -o ex8
+#+end_src
+
+#+name: exec_ex8
+#+begin_src bash :dir src/ :results output
+./ex8
+#+end_src
+
+#+RESULTS: exec_ex8
+: Hi
+
+* TODO Example9
+
+#+name: ex9.asm
+#+begin_src asm :tangle src/ex9.asm :mkdirp yes
+#+end_src
+
+#+name: compile_ex9.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex9.asm -o ex9.o
+        ld -m elf_i386 ex9.o -o ex9
+#+end_src
+
+#+name: exec_ex9
+#+begin_src bash :dir src/ :results output
+./ex9
+#+end_src
+
+#+RESULTS: exec_ex9
+: Hey!
+* TODO Example10
+
+#+name: ex10.asm
+#+begin_src asm :tangle src/ex10.asm :mkdirp yes
+#+end_src
+
+#+name: compile_ex10.asm
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 ex10.asm -o ex10.o
+        ld -m elf_i386 ex10.o -o ex10
+#+end_src
+
+#+name: exec_ex10
+#+begin_src bash :dir src/ :results output
+./ex10
+#+end_src
+
+#+RESULTS: exec_ex10
 : Hey!
 
 
