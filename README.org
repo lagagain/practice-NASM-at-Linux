@@ -416,10 +416,31 @@ func:
 #+RESULTS: exec_ex8
 : Hi
 
-* TODO Example9
+* Example9
+  CLOSED: [2019-09-26 四 16:55]
+  :LOGBOOK:
+  - State "DONE"       from "NEXT"       [2019-09-26 四 16:55]
+  :END:
 
 #+name: ex9.asm
 #+begin_src asm :tangle src/ex9.asm :mkdirp yes
+global _start
+
+_start:
+    push 21
+    call times2
+    mov ebx, eax
+    mov eax, 1
+    int 0x80
+
+times2:
+    push ebp
+    mov ebp, esp
+    mov eax, [ebp+8]
+    add eax, eax
+    mov esp, ebp
+    pop ebp
+    ret
 #+end_src
 
 #+name: compile_ex9.asm
@@ -431,29 +452,92 @@ func:
 #+name: exec_ex9
 #+begin_src bash :dir src/ :results output
 ./ex9
+echo $?
 #+end_src
 
 #+RESULTS: exec_ex9
-: Hey!
-* TODO Example10
+: 42
+* Example10
 
 #+name: ex10.asm
 #+begin_src asm :tangle src/ex10.asm :mkdirp yes
+global main
+
+extern printf
+
+section .data
+    msg db "Testing %i...", 0x0a, 0x00
+
+main:
+    push ebp
+    mov ebp, esp
+    push 123
+    push msg
+    call printf
+    mov eax, 0
+    mov esp, ebp
+    pop ebp
+    ret
 #+end_src
 
 #+name: compile_ex10.asm
 #+begin_src bash :dir src/ :results none
         nasm -f elf32 ex10.asm -o ex10.o
-        ld -m elf_i386 ex10.o -o ex10
+        gcc -m32 ex10.o -o ex10
 #+end_src
+
+Note: 貌似我沒安裝32位元的gcc，找不到-lgcc
 
 #+name: exec_ex10
 #+begin_src bash :dir src/ :results output
 ./ex10
 #+end_src
 
-#+RESULTS: exec_ex10
-: Hey!
+* Example11
+
+#+name: add42.asm
+#+begin_src asm :tangle src/add42.asm :mkdirp yes
+global add42
+
+add42:
+    push ebp
+    mov ebp, esp
+    mov eax, [ebp+8]
+    add eax, 42
+    mov esp, ebp
+    pop ebp
+    ret
+#+end_src
+
+#+name:add42.h
+#+begin_src c :tangle src/add42.h :mkdirp yes
+// Function that returns x + 42
+int add42(int x);
+#+end_src
+
+#+name: ex11
+#+begin_src c :tangle src/ex11.c :mkdirp yes
+#include <stdio.h>
+#include "add42.h"
+
+int main() {
+    int result;
+    result = add42(30);
+    printf("Result: %i\n", result);
+    return 0;
+}
+#+end_src
+
+#+name: compile_ex11
+#+begin_src bash :dir src/ :results none
+        nasm -f elf32 add42.asm -o add42.o
+        gcc -m32 add42.o ex11.c -o ex11
+#+end_src
+
+#+name: exec_ex11
+#+begin_src bash :dir src/ :results output
+./ex11
+#+end_src
 
 
 * 授權(LICENSE)

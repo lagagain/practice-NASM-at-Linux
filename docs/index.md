@@ -319,28 +319,93 @@
     Hi
 
 
-# TODO Example9
+# Example9
 
+    global _start
     
+    _start:
+        push 21
+        call times2
+        mov ebx, eax
+        mov eax, 1
+        int 0x80
+    
+    times2:
+        push ebp
+        mov ebp, esp
+        mov eax, [ebp+8]
+        add eax, eax
+        mov esp, ebp
+        pop ebp
+        ret
 
     nasm -f elf32 ex9.asm -o ex9.o
     ld -m elf_i386 ex9.o -o ex9
 
     ./ex9
+    echo $?
 
-    Hey!
+    42
 
 
-# TODO Example10
+# Example10
 
+    global main
     
+    extern printf
+    
+    section .data
+        msg db "Testing %i...", 0x0a, 0x00
+    
+    main:
+        push ebp
+        mov ebp, esp
+        push 123
+        push msg
+        call printf
+        mov eax, 0
+        mov esp, ebp
+        pop ebp
+        ret
 
     nasm -f elf32 ex10.asm -o ex10.o
-    ld -m elf_i386 ex10.o -o ex10
+    gcc -m32 ex10.o -o ex10
+
+Note: 貌似我沒安裝32位元的gcc，找不到-lgcc
 
     ./ex10
 
-    Hey!
+
+# Example11
+
+    global add42
+    
+    add42:
+        push ebp
+        mov ebp, esp
+        mov eax, [ebp+8]
+        add eax, 42
+        mov esp, ebp
+        pop ebp
+        ret
+
+    // Function that returns x + 42
+    int add42(int x);
+
+    #include <stdio.h>
+    #include "add42.h"
+    
+    int main() {
+        int result;
+        result = add42(30);
+        printf("Result: %i\n", result);
+        return 0;
+    }
+
+    nasm -f elf32 add42.asm -o add42.o
+    gcc -m32 add42.o ex11.c -o ex11
+
+    ./ex11
 
 
 # 授權(LICENSE)
