@@ -550,6 +550,7 @@ int main() {
 ** Other
  [[https://youtu.be/Ac4cCEySLUs?list=WL&t=75][他犧牲自己的一生，揭發政府監控人民的真相! | 永久檔案 | 啾讀。第51集 | 啾啾鞋]]
 
+#+name: quot_to_explain_why_study_asm
 #+begin_quote
 理解一件科技設備，並且當它壞掉的時候以正確的方式檢查，嘗試修復它，是一個人對於科技的最基本的責任，不要隨便敷衍科技。
 
