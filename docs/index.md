@@ -10,12 +10,22 @@
 
 建置以前你需要先將本範例中的程式碼 `tangle` 出去。
 
-    (org-babel-tangle)
+    (sort (org-babel-tangle) 'string<)
 
--   src/ex4.asm
--   src/ex3.asm
--   src/ex2.asm
+-   src/add42.asm
+-   src/add42.h
 -   src/ex1.asm
+-   src/ex10.asm
+-   src/ex11.c
+-   src/ex2.asm
+-   src/ex3.asm
+-   src/ex4.asm
+-   src/ex5.asm
+-   src/ex6.asm
+-   src/ex7-1.asm
+-   src/ex7-2.asm
+-   src/ex8.asm
+-   src/ex9.asm
 -   src/hello.asm
 
 接著建置：
