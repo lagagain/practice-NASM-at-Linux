@@ -54,6 +54,7 @@
 - [[https://syscalls.kernelgrok.com/][Linux Syscall Reference]]
 - [[https://shapeshed.com/unix-exit-codes/][Linux and Unix exit code tutorial with examples]]
 - [[https://linux.incomeself.com/linux%25E7%25B3%25BB%25E7%25B5%25B1%25E5%2591%25BC%25E5%258F%25AB%25EF%25BC%2588system-call%25EF%25BC%2589%25E5%2587%25BD%25E5%25BC%258F%25E5%25A2%259E%25E5%258A%25A0%25E7%25AF%2587%25E3%2580%258E%25E7%25B8%25BD%25E6%2595%25B4%25E7%2590%2586%25E3%2580%258F/][Linux系統呼叫（System call）函式增加篇『總整理』]]
+- [[https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/][Linux System Call Table for x86 64]]
 
 
 系統呼叫表原始碼位置： =/usr/src/linux-headers-4.4.0-98-generic/arch/x86/include/generated/uapi/asm/unistd_64.h=
