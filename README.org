@@ -7,7 +7,7 @@
 
 
 * 說明
-  這是我的NASM組合語言練習筆記。我是根據[[https://www.youtube.com/watch?v=wLXIWKUWpSs&list=PLmxT2pVYo5LB5EzTPZGfFN0c2GDiSXgQe][{YouTube}Intro to x86 Assembly Language]]進行學習。筆記下多數程式碼是該影片的範例修改而來。
+  這是我的 NASM 組合語言練習筆記。我是根據[[https://www.youtube.com/watch?v=wLXIWKUWpSs&list=PLmxT2pVYo5LB5EzTPZGfFN0c2GDiSXgQe][{YouTube}Intro to x86 Assembly Language]]進行學習。筆記下多數程式碼是該影片的範例修改而來。
   原始程式碼倉庫：https://github.com/code-tutorials/assembly-intro
 * 建置(Build)&執行(Exec)
   建置以前你需要先將本範例中的程式碼 =tangle= 出去。
@@ -39,10 +39,10 @@
   make
   #+end_src
 
-  所有目的執行程式都會在 =build= 目錄下。你可以參考本筆記內容執行程式，或是在Emacs org-mode下執行本筆記。
+  所有目的執行程式都會在 =build= 目錄下。你可以參考本筆記內容執行程式，或是在 Emacs org-mode 下執行本筆記。
 
   #+begin_comment
-  不知道Jupyter-Notebooke能不能寫的像Org-mode這麼靈活0.0
+  不知道 Jupyter-Notebooke 能不能寫的像 Org-mode 這麼靈活 0.0
   #+end_comment
 
 ** 清除(Clean)
@@ -336,9 +336,9 @@ _start:
       jmp eax                     ;(ref:ex7-1 jmp eax)
 #+end_src
 
-32 bit的暫存器用eax命名，64 bits的叫rax(第[[(ex7-1 32bit register)]]行)。
+32 bit 的暫存器用 eax 命名，64 bits 的叫 rax(第[[(ex7-1 32bit register)]]行)。
 
-第[[(ex7-1 pop eax)]]-[[(ex7-1 jmp eax)]]行 同樣可以表示為 =ret= ，見下方ex7-2
+第[[(ex7-1 pop eax)]]-[[(ex7-1 jmp eax)]]行 同樣可以表示為 =ret= ，見下方 ex7-2
 #+name: compile_ex7-1.asm
 #+begin_src bash :dir src/ :results none
         nasm -f elf32 ex7-1.asm -o ex7-1.o
@@ -497,7 +497,7 @@ main:
         gcc -m32 ex10.o -o ex10
 #+end_src
 
-Note: 貌似我沒安裝32位元的gcc，找不到-lgcc
+Note: 貌似我沒安裝 32 位元的 gcc，找不到-lgcc
 
 #+name: exec_ex10
 #+begin_src bash :dir src/ :results output
@@ -550,14 +550,96 @@ int main() {
 ./ex11
 #+end_src
 
+* Hello C, Hello ASM
+
+** NASM code
+ #+name: hello_asm.asm
+ #+begin_src asm :tangle src/hello_asm.asm :mkdirp yes
+     section     .text
+     global      hello_asm                              ;must be declared for linker (ld)
+
+     hello_asm:                                                 ;tell linker entry point
+
+             mov     edx,len                             ;message length
+             mov     ecx,        msg                     ;message to write
+             mov     ebx,1                               ;file descriptor (stdout)
+             mov     eax,4                               ;system call number (sys_write)
+             int     0x80                                ;call kernel
+
+
+     section     .data
+
+             msg     db  'Hello, NASM!',0xa                 ;our dear string
+             len      equ $ - msg                             ;length of our dear string
+ #+end_src
+ like [[Hello World][Hello World]], but not exit process.
+
+** NASM code header for C
+#+name: NASM_code_header_for_C
+#+begin_src c :tangle src/hello_asm.h :mkdirp yes
+extern void hello_asm(void);
+#+end_src
+
+** C code
+#+name: hello_c.c
+#+begin_src c :tangle src/hello_c.c :mkdirp yes
+#include<stdio.h>
+#include<stdlib.h>
+
+void hello_c(){
+  printf("Hello, C\n");
+}
+#+end_src
+
+#+name: hello_c.h
+#+begin_src c :tangle src/hello_c.h :mkdirp yes
+void hello_c();
+#+end_src
+
+** C main code
+
+#+name: hello_main.c
+#+begin_src c :tangle src/hello_main.c :mkdirp yes
+#include<stdio.h>
+#include<stdlib.h>
+#include "hello_asm.h"
+#include "hello_c.h"
+//extern void hello_asm(void);
+//extern void hello_c();
+
+int main(void){
+  printf("Hello, World\n");
+  hello_asm();
+  printf("\n");
+  hello_c();
+  return 0;
+}
+#+end_src
+
+** Compile
+
+#+begin_src shell
+nasm -felf64 hello_asm.asm -o hello_asm.o
+gcc -c hello_c.c -o hello_c.o
+gcc -no-pie hello_main.c hello_c.o hello_asm.o -o hello
+./hello
+#+end_src
+
+
+#+begin_example
+Hello, NASM!
+Hello, World
+
+Hello, C
+#+end_example
 
 * 授權(LICENSE)
-  *本筆記除了程式碼部份外，其餘部份採用CC-3.0授權。*
+  *本筆記除了程式碼部份外，其餘部份採用 CC-3.0 授權。*
 #+begin_export html
   <a rel="license" href="http://creativecommons.org/licenses/by/3.0/tw/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by/3.0/tw/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">又LAG在Linux上的x86組合語言練習(使用NASM)</span>由<a xmlns:cc="http://creativecommons.org/ns#" href="https://www.lagagain.com" property="cc:attributionName" rel="cc:attributionURL"> lagagain(LAG)</a>製作，以<a rel="license" href="http://creativecommons.org/licenses/by/3.0/tw/">創用CC 姓名標示 3.0 台灣 授權條款</a>釋出。
 #+end_export
 * 後記
-  雖然我以前就有NASM的基礎，不過以前看的書的範例平台是使用Windows，也未太過深入了解系統中斷、系統呼叫。這次有比較深入的學習。
+  雖然我以前就有 NASM 的基礎，不過以前看的書的範例平台是使用 Windows，也未太過深入了解系統中斷、系統呼叫。這次有比較深入的學習。
 ** Other
  [[https://youtu.be/Ac4cCEySLUs?list=WL&t=75][他犧牲自己的一生，揭發政府監控人民的真相! | 永久檔案 | 啾讀。第51集 | 啾啾鞋]]
 
